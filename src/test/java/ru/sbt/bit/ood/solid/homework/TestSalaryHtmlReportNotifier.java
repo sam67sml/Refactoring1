@@ -13,7 +13,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,9 +47,14 @@ public class TestSalaryHtmlReportNotifier {
         // execute
         notificator.generateAndSendHtmlSalaryReport("10", dateFrom, dateTo, "somebody@gmail.com");
         // verify results
+        String expectedReportPath = "src/test/resources/expectedReport.html";
+        assertActualReportEqualsTo(mockMimeMessageHelper, expectedReportPath);
+    }
+
+    private void assertActualReportEqualsTo(MimeMessageHelper mockMimeMessageHelper, String expectedReportPath) throws MessagingException, IOException {
         ArgumentCaptor<String> messageTextArgumentCaptor = ArgumentCaptor.forClass(String.class);
         verify(mockMimeMessageHelper).setText(messageTextArgumentCaptor.capture(), anyBoolean());
-        Path path = Paths.get("src/test/resources/expectedReport.html");
+        Path path = Paths.get(expectedReportPath);
         String expectedReportContent = new String(Files.readAllBytes(path));
         assertEquals(messageTextArgumentCaptor.getValue(), expectedReportContent);
     }
