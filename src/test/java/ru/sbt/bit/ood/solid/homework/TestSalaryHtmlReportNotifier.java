@@ -2,11 +2,6 @@ package ru.sbt.bit.ood.solid.homework;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
-
 import org.mockito.ArgumentCaptor;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -26,6 +21,10 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SalaryHtmlReportNotifier.class)
 public class TestSalaryHtmlReportNotifier {
@@ -42,10 +41,9 @@ public class TestSalaryHtmlReportNotifier {
 
         // set up parameters
         SalaryHtmlReportNotifier notificator = new SalaryHtmlReportNotifier(someFakeConnection);
-        LocalDate dateFrom = LocalDate.of(2014, Month.JANUARY, 1);
-        LocalDate dateTo = LocalDate.of(2014, Month.DECEMBER, 31);
+        LocalDateRange dateRange = new LocalDateRange(LocalDate.of(2014, Month.JANUARY, 1), LocalDate.of(2014, Month.DECEMBER, 31));
         // execute
-        notificator.generateAndSendHtmlSalaryReport("10", dateFrom, dateTo, "somebody@gmail.com");
+        notificator.generateAndSendHtmlSalaryReport("10", dateRange, "somebody@gmail.com");
         // verify results
         String expectedReportPath = "src/test/resources/expectedReport.html";
         assertActualReportEqualsTo(mockMimeMessageHelper, expectedReportPath);
