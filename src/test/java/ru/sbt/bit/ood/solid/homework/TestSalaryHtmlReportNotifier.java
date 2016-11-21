@@ -7,6 +7,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import ru.sbt.domain.DateRange;
+import ru.sbt.notifiers.SalaryHtmlReportNotifier;
+import ru.sbt.notifiers.mail.MailParameters;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -40,10 +43,11 @@ public class TestSalaryHtmlReportNotifier {
         MimeMessageHelper mockMimeMessageHelper = getMockedMimeMessageHelper();
 
         // set up parameters
-        SalaryHtmlReportNotifier notificator = new SalaryHtmlReportNotifier(someFakeConnection);
-        LocalDateRange dateRange = new LocalDateRange(LocalDate.of(2014, Month.JANUARY, 1), LocalDate.of(2014, Month.DECEMBER, 31));
+        MailParameters mailParameters = new MailParameters("somebody@gmail.com", "Monthly department salary report", "mail.google.com", true);
+        SalaryHtmlReportNotifier notificator = new SalaryHtmlReportNotifier(someFakeConnection, mailParameters);
+        DateRange dateRange = new DateRange(LocalDate.of(2014, Month.JANUARY, 1), LocalDate.of(2014, Month.DECEMBER, 31));
         // execute
-        notificator.generateAndSendHtmlSalaryReport("10", dateRange, "somebody@gmail.com");
+        notificator.generateAndSendHtmlMailSalaryReport("10", dateRange);
         // verify results
         String expectedReportPath = "src/test/resources/expectedReport.html";
         assertActualReportEqualsTo(mockMimeMessageHelper, expectedReportPath);
@@ -72,7 +76,7 @@ public class TestSalaryHtmlReportNotifier {
         when(mockMailSender.createMimeMessage()).thenReturn(mockMimeMessage);
         whenNew(JavaMailSenderImpl.class).withNoArguments().thenReturn(mockMailSender);
         MimeMessageHelper mockMimeMessageHelper = mock(MimeMessageHelper.class);
-        whenNew(MimeMessageHelper.class).withArguments(any(), any()).thenReturn(mockMimeMessageHelper);
+        whenNew(MimeMessageHelper.class).withArguments(any()).thenReturn(mockMimeMessageHelper);
         return mockMimeMessageHelper;
     }
 
